@@ -71,7 +71,7 @@ public class PoliceService {
                 return jsonResponse.getJSONArray("results").getJSONObject(0).getString("address_line2");
             }
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         return null;
     }

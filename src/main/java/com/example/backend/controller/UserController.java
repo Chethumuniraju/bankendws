@@ -1,11 +1,14 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.AuthRequest;
+import com.example.backend.dto.ComplaintDTO;
+import com.example.backend.model.Complaint;
 import com.example.backend.model.Contacts;
 import com.example.backend.model.User;
 import com.example.backend.security.JwtUtil;
-import com.example.backend.service.UserService;
+import com.example.backend.service.ComplaintService;
 import com.example.backend.service.ContactsService;
+import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,9 @@ public class UserController {
 
     @Autowired
     private ContactsService contactsService;
+
+    @Autowired
+    private ComplaintService complaintService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -78,4 +84,13 @@ public class UserController {
         contactsService.deleteContact(jwtToken, contactId);
         return ResponseEntity.ok("Contact deleted successfully");
     }
+
+    // Register a Complaint
+@PostMapping("/register-complaint")
+public ResponseEntity<String> registerComplaint(
+        @RequestHeader("Authorization") String token,
+        @RequestBody ComplaintDTO complaintDTO) {
+    return complaintService.registerComplaint(token.substring(7), complaintDTO);
+}
+
 }
