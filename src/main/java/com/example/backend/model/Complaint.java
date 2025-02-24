@@ -21,4 +21,16 @@ public class Complaint {
     private double latitude;
     private double longitude;
     private String address;
+    private String message;
+
+    @ManyToOne
+    @JoinColumn(name = "police_id", nullable = false)
+    private Police police;  // Changed police_id to Police entity
+
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.PENDING; // Default status
+
+    public enum Status {
+        PENDING, ONGOING, DROPPED, FINISHED
+    }
 }

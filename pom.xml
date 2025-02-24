@@ -45,7 +45,7 @@
             <scope>runtime</scope>
         </dependency>
 
-       <!-- JSON Web Token (JWT) Dependencies -->
+        <!-- JSON Web Token (JWT) Dependencies -->
 <dependency>
     <groupId>io.jsonwebtoken</groupId>
     <artifactId>jjwt-api</artifactId>
@@ -67,11 +67,21 @@
 </dependency>
 
 
+
+
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- JSON Processing -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version>
         </dependency>
 
         <!-- Development Tools -->
@@ -88,11 +98,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-    <groupId>org.json</groupId>
-    <artifactId>json</artifactId>
-    <version>20210307</version>
-</dependency>
     </dependencies>
 
     <build>
