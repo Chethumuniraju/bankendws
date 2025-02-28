@@ -42,7 +42,7 @@ public class ComplaintService {
     }
     private static final Dotenv dotenv = Dotenv.load();
 
-   
+    private static final String GEOAPIFY_API_KEY = "49f1ab120d0b4477a74c9fb42fadbf49"; // Replace with actual key
     private static final String GEOAPIFY_URL = "https://api.geoapify.com/v1/geocode/reverse?lat=%f&lon=%f&format=json&apiKey=%s";
     public static final String ACCOUNT_SID = dotenv.get("ACCOUNT_SID");
     public static final String AUTH_TOKEN = dotenv.get("AUTH_TOKEN");
