@@ -2,8 +2,8 @@ package com.example.backend.repository;
 
 import com.example.backend.model.Police;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
-@Repository
 public interface PoliceRepository extends JpaRepository<Police, Long> {
+    Optional<Police> findByEmail(String email);
 }

@@ -44,6 +44,7 @@ public class ContactsService {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+            System.out.println(contactsRepository.findByUser(user));
             return contactsRepository.findByUser(user);
         } else {
             throw new RuntimeException("User not found");

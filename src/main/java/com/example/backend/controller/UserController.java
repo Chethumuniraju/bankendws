@@ -12,9 +12,8 @@ import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("api/users")
 public class UserController {
@@ -87,9 +86,11 @@ public class UserController {
 
     // Register a Complaint
 @PostMapping("/register-complaint")
-public ResponseEntity<String> registerComplaint(
+public ResponseEntity<String> registerComplaint(    
+    
         @RequestHeader("Authorization") String token,
         @RequestBody ComplaintDTO complaintDTO) {
+            System.out.println("Extracted Email:");
     return complaintService.registerComplaint(token.substring(7), complaintDTO);
 }
 

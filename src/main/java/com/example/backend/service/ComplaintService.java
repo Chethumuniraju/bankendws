@@ -1,7 +1,10 @@
 package com.example.backend.service;
-
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 import com.example.backend.dto.ComplaintDTO;
 import com.example.backend.model.Complaint;
+import com.example.backend.model.Contacts;
 import com.example.backend.model.Police;
 import com.example.backend.model.User;
 import com.example.backend.repository.ComplaintRepository;
@@ -15,10 +18,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Optional;
+import com.example.backend.service.ContactsService;
 
 @Service
 public class ComplaintService {
-
+    @Autowired
+    private ContactsService contactsService;
     @Autowired
     private ComplaintRepository complaintRepository;
 
@@ -30,18 +35,40 @@ public class ComplaintService {
 
     @Autowired
     private JwtUtil jwtUtil;
+    public List<Complaint> getAllComplaints() {
+        return complaintRepository.findAll();
+    }
 
     private static final String GEOAPIFY_API_KEY = "49f1ab120d0b4477a74c9fb42fadbf49"; // Replace with actual key
     private static final String GEOAPIFY_URL = "https://api.geoapify.com/v1/geocode/reverse?lat=%f&lon=%f&format=json&apiKey=%s";
+    
+    private static final String ACCOUNT_SID = "ACd09337030d4e9697306e8b8c0839195d";
+    private static final String AUTH_TOKEN = "8c2d1aea52d643cd8fec4537182dae13";
+    private static final String TWILIO_PHONE_NUMBER = "+17628421927";
+    static {
+        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+    }
 
     public ResponseEntity<String> registerComplaint(String jwtToken, ComplaintDTO complaintDTO) {
         // Extract email from JWT token
         String userEmail = jwtUtil.extractEmail(jwtToken);
+        System.out.println("Extracted Email: " + userEmail);
+    
         Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        System.out.println("User Found: " + optionalUser.isPresent());
+    
         if (optionalUser.isEmpty()) {
             return ResponseEntity.status(404).body("User not found");
         }
         User user = optionalUser.get();
+        System.out.println("User ID: " + user.getId());
+    
+        // Fetch contacts for the user
+        List<Contacts> contactsList = contactsService.getUserContacts(jwtToken);
+        System.out.println("Here is our contacts list: " + contactsList);
+    
+        
+
 
         // Fetch address from Geoapify
         String address = fetchAddressFromGeoapify(complaintDTO.getLatitude(), complaintDTO.getLongitude());
@@ -63,11 +90,30 @@ public class ComplaintService {
         complaint.setLongitude(complaintDTO.getLongitude());
         complaint.setAddress(address);
         complaint.setPolice(nearestPolice);
-        complaint.setStatus("Pending"); // Initial status
+        complaint.setStatus("Pending");
 
         complaintRepository.save(complaint);
-        return ResponseEntity.ok("Complaint registered successfully");
+
+        // **Send SMS notifications**
+        String messageBody = "Emergency Alert! "+ address ;
+
+        for (Contacts contact : contactsList) {
+            String phoneNumber = "+91" + contact.getContactNo();
+            System.out.println("Sending SMS to: " + phoneNumber);
+            sendSmsNotification(phoneNumber, messageBody);
+        }
+
+        return ResponseEntity.ok("Complaint registered successfully, contacts notified.");
     }
+
+    private void sendSmsNotification(String to, String messageBody) {
+        Message.creator(
+                new PhoneNumber(to),
+                new PhoneNumber(TWILIO_PHONE_NUMBER),
+                messageBody
+        ).create();
+    }
+
 
     // Fetch address from Geoapify
     private String fetchAddressFromGeoapify(double latitude, double longitude) {
