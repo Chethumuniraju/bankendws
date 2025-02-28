@@ -31,6 +31,9 @@ public class AdminController {
 
     @Autowired
     private JwtUtil jwtUtil;
+    public AdminController(ComplaintService complaintService) {
+        this.complaintService = complaintService;
+    }
 
     // Register Admin
     @PostMapping("/register")
