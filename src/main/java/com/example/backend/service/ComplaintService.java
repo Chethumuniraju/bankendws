@@ -44,8 +44,12 @@ public class ComplaintService {
 
     private static final String GEOAPIFY_API_KEY = "49f1ab120d0b4477a74c9fb42fadbf49"; // Replace with actual key
     private static final String GEOAPIFY_URL = "https://api.geoapify.com/v1/geocode/reverse?lat=%f&lon=%f&format=json&apiKey=%s";
-
-   
+    public static final String ACCOUNT_SID = dotenv.get("ACCOUNT_SID");
+    public static final String AUTH_TOKEN = dotenv.get("AUTH_TOKEN");
+    public static final String TWILIO_PHONE_NUMBER = dotenv.get("TWILIO_PHONE_NUMBER");
+    static {
+        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+    }
 
     public ResponseEntity<String> registerComplaint(String jwtToken, ComplaintDTO complaintDTO) {
         // Extract email from JWT token
@@ -104,13 +108,13 @@ public class ComplaintService {
         return ResponseEntity.ok("Complaint registered successfully, contacts notified.");
     }
 
-    // private void sendSmsNotification(String to, String messageBody) {
-    //     Message.creator(
-    //             new PhoneNumber(to),
-    //             new PhoneNumber(TWILIO_PHONE_NUMBER),
-    //             messageBody
-    //     ).create();
-    // }
+    private void sendSmsNotification(String to, String messageBody) {
+        Message.creator(
+                new PhoneNumber(to),
+                new PhoneNumber(TWILIO_PHONE_NUMBER),
+                messageBody
+        ).create();
+    }
 
 
     // Fetch address from Geoapify
