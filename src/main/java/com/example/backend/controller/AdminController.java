@@ -20,19 +20,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/admins")
 public class AdminController {
 
-    @Autowired
-    private ComplaintService complaintService;
+    private final ComplaintService complaintService;
+    private final AdminService adminService;
+    private final PoliceService policeService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    private AdminService adminService;
-
-    @Autowired
-    private PoliceService policeService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-    public AdminController(ComplaintService complaintService) {
+    public AdminController(
+            ComplaintService complaintService,
+            AdminService adminService,
+            PoliceService policeService,
+            JwtUtil jwtUtil) {
         this.complaintService = complaintService;
+        this.adminService = adminService;
+        this.policeService = policeService;
+        this.jwtUtil = jwtUtil;
     }
 
     // Register Admin

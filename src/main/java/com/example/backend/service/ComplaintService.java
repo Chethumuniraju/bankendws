@@ -18,35 +18,50 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Optional;
-import com.example.backend.service.ContactsService;
 import io.github.cdimascio.dotenv.Dotenv;
 
 
 @Service
 public class ComplaintService {
-    @Autowired
-    private ContactsService contactsService;
-    @Autowired
-    private ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
+    private final PoliceRepository policeRepository;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
+    private final ContactsService contactsService;
 
     @Autowired
-    private PoliceRepository policeRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private JwtUtil jwtUtil;
+    public ComplaintService(
+            ComplaintRepository complaintRepository,
+            PoliceRepository policeRepository,
+            UserRepository userRepository,
+            JwtUtil jwtUtil,
+            ContactsService contactsService) {
+        this.complaintRepository = complaintRepository;
+        this.policeRepository = policeRepository;
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+        this.contactsService = contactsService;
+    }
     public List<Complaint> getAllComplaints() {
         return complaintRepository.findAll();
     }
-    private static final Dotenv dotenv = Dotenv.load();
+   
 
     private static final String GEOAPIFY_API_KEY = "49f1ab120d0b4477a74c9fb42fadbf49"; // Replace with actual key
     private static final String GEOAPIFY_URL = "https://api.geoapify.com/v1/geocode/reverse?lat=%f&lon=%f&format=json&apiKey=%s";
-    public static final String ACCOUNT_SID = dotenv.get("ACCOUNT_SID");
-    public static final String AUTH_TOKEN = dotenv.get("AUTH_TOKEN");
-    public static final String TWILIO_PHONE_NUMBER = dotenv.get("TWILIO_PHONE_NUMBER");
+    private static Dotenv dotenv;
+static {
+    try {
+        dotenv = Dotenv.load();
+    } catch (Exception e) {
+        // Fallback to environment variables
+        dotenv = null;
+    }
+}
+// And then modify your variables to handle null dotenv:
+public static final String ACCOUNT_SID = dotenv != null ? dotenv.get("ACCOUNT_SID") : System.getenv("ACCOUNT_SID");
+public static final String AUTH_TOKEN = dotenv != null ? dotenv.get("AUTH_TOKEN") : System.getenv("AUTH_TOKEN");
+public static final String TWILIO_PHONE_NUMBER = dotenv != null ? dotenv.get("TWILIO_PHONE_NUMBER") : System.getenv("TWILIO_PHONE_NUMBER");
     static {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
     }
