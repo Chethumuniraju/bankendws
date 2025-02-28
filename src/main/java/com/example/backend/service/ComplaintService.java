@@ -19,6 +19,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Optional;
 import com.example.backend.service.ContactsService;
+import io.github.cdimascio.dotenv.Dotenv;
+
 
 @Service
 public class ComplaintService {
@@ -38,13 +40,13 @@ public class ComplaintService {
     public List<Complaint> getAllComplaints() {
         return complaintRepository.findAll();
     }
+    private static final Dotenv dotenv = Dotenv.load();
 
     private static final String GEOAPIFY_API_KEY = "49f1ab120d0b4477a74c9fb42fadbf49"; // Replace with actual key
     private static final String GEOAPIFY_URL = "https://api.geoapify.com/v1/geocode/reverse?lat=%f&lon=%f&format=json&apiKey=%s";
-    
-    private static final String ACCOUNT_SID = "ACd09337030d4e9697306e8b8c0839195d";
-    private static final String AUTH_TOKEN = "8c2d1aea52d643cd8fec4537182dae13";
-    private static final String TWILIO_PHONE_NUMBER = "+17628421927";
+    public static final String ACCOUNT_SID = dotenv.get("ACCOUNT_SID");
+    public static final String AUTH_TOKEN = dotenv.get("AUTH_TOKEN");
+    public static final String TWILIO_PHONE_NUMBER = dotenv.get("TWILIO_PHONE_NUMBER");
     static {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
     }
