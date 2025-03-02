@@ -95,7 +95,9 @@ public static final String TWILIO_PHONE_NUMBER = dotenv != null ? dotenv.get("TW
 
         // Find the nearest police station
         Police nearestPolice = findNearestPoliceStation(complaintDTO.getLatitude(), complaintDTO.getLongitude());
-       
+        if (nearestPolice == null) {
+            return ResponseEntity.status(404).body("No nearby police station found");
+        }
 
         // Create and save the complaint
         Complaint complaint = new Complaint();
@@ -110,7 +112,7 @@ public static final String TWILIO_PHONE_NUMBER = dotenv != null ? dotenv.get("TW
         complaintRepository.save(complaint);
 
         // **Send SMS notifications**
-        String messageBody = "Emergency Alert! , I am here  "+ address ;
+        String messageBody = "Emergency Alert! "+ address ;
 
         for (Contacts contact : contactsList) {
             String phoneNumber = "+91" + contact.getContactNo();
@@ -122,12 +124,18 @@ public static final String TWILIO_PHONE_NUMBER = dotenv != null ? dotenv.get("TW
     }
 
     private void sendSmsNotification(String to, String messageBody) {
-        Message.creator(
-                new PhoneNumber(to),
-                new PhoneNumber(TWILIO_PHONE_NUMBER),
-                messageBody
-        ).create();
+        try {
+            Message.creator(
+                    new PhoneNumber(to),
+                    new PhoneNumber(TWILIO_PHONE_NUMBER),
+                    messageBody
+            ).create();
+        } catch (Exception e) {
+            System.err.println("Twilio SMS failed: " + e.getMessage());
+            // Do nothing and let the process continue
+        }
     }
+    
 
 
     // Fetch address from Geoapify
